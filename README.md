@@ -1,49 +1,64 @@
-# FortiGate for Home Assistant
+# FortiGate Policy Automation for Home Assistant
 
-A custom Home Assistant integration that exposes FortiGate firewall policies as switch entities, so you can enable or disable policies from dashboards and automations.
+Control your FortiGate firewall policies straight from Home Assistant. Every firewall policy appears as its own device with two simple toggles:
 
-## Features
+- **Enabled** turns the policy on or off, exactly like the enable/disable toggle in the FortiGate interface.
+- **Allow traffic** flips the policy between allow (accept) and deny.
 
-- One switch per firewall policy: on means the policy is enabled
-- Policy attributes: policy id, source and destination interfaces, action
-- Device page with model, serial number and FortiOS version
-- Config flow setup with reauthentication when the token is rotated
-- Local polling of the FortiOS REST API every 30 seconds; no cloud dependency
+Each policy also gets two counters, ready for dashboards and graphs:
 
-## Requirements
+- **Hits** counts how many times the policy has matched traffic.
+- **Bytes** tracks how much data has passed through the policy.
 
-- FortiOS 7.x (6.4+ may work but is not tested)
-- A REST API administrator token (see security notes below)
-- Home Assistant 2025.1 or newer
+Use them on dashboards or in automations, for example to cut off internet access to the kids' devices at bedtime, or to open a rule only while you are home.
 
-## Installation (manual, v0.1)
+Everything runs locally over the FortiGate's REST API. There is no cloud dependency, and Home Assistant checks the firewall every 30 seconds so the toggles always reflect what the firewall is really doing.
 
-1. Copy the `custom_components/fortigate` folder into the `custom_components` directory of your Home Assistant configuration.
-2. Restart Home Assistant.
-3. Go to Settings, then Devices and services, then Add integration, and search for FortiGate.
-4. Enter the host, API token, VDOM (default `root`) and whether to verify the SSL certificate.
+## Before you start
 
-## Creating the API token on the FortiGate
+You will need three things:
 
-1. Create an administrator profile with write access limited to Firewall Policy (Policy and Objects, Policy) and read access to System for the status call.
-2. Create a REST API administrator using that profile and note the token shown once at creation.
-3. Restrict the administrator's trusted hosts to your Home Assistant IP address.
+1. **FortiOS 7.x** on your FortiGate (6.4 or newer may work but is not tested).
+2. **HTTPS enabled on the interface Home Assistant connects through.** The REST API is only reachable over HTTPS, so make sure it is switched on for the right interface: in the FortiGate interface go to **Network > Interfaces**, edit the interface that faces Home Assistant (usually your LAN interface), and tick **HTTPS** under **Administrative Access**. Save the change.
+3. **A REST API administrator token.** See the next section.
+
+### Creating the API token
+
+1. On the FortiGate, go to **System > Admin Profiles** and create a new profile. Give it **Read/Write** access to **Firewall > Policy** and **Read** access to **System**, and leave everything else at **None**.
+2. Go to **System > Administrators**, choose **Create New > REST API Admin**, and give it the profile you just created.
+3. Under **Trusted Hosts**, add your Home Assistant IP address so nothing else can use the token.
+4. When you save, the FortiGate shows the token **once**. Copy it somewhere safe; you will paste it into Home Assistant in a moment.
+
+## Installation
+
+This integration is installed through [HACS](https://hacs.xyz), the community store for Home Assistant. If you do not have HACS yet, follow the [HACS installation guide](https://hacs.xyz/docs/use/) first.
+
+1. In Home Assistant, open **HACS** from the sidebar.
+2. Click the three-dot menu in the top right and choose **Custom repositories**.
+3. Paste `https://github.com/dancmorgan/fortigate-policy-switch-ha` as the repository, choose **Integration** as the type, and click **Add**.
+4. Search HACS for **FortiGate Policy Automation** and open it.
+5. Click **Download**, confirm, and then restart Home Assistant when prompted.
+6. After the restart, go to **Settings > Devices & services**, click **Add integration**, and search for **FortiGate Policy Automation**.
+7. Enter your FortiGate's hostname or IP address, paste the API token, and leave the VDOM as `root` unless you use multiple VDOMs. If your FortiGate uses a self-signed certificate, untick **Verify SSL certificate**.
+
+That's it. Your firewall policies will appear under **Settings > Devices & services > FortiGate Policy Automation**, one device per policy, all linked to the FortiGate itself.
+
+## Good to know
+
+- Toggling **Allow traffic** off changes the policy's action to deny; the policy stays enabled, it just blocks instead of allows. IPsec policies do not get this toggle because their action must not change.
+- If a policy is deleted on the FortiGate, its toggles become unavailable in Home Assistant.
+- The hit and byte counters reset when the FortiGate reboots or when you clear them on the firewall. Home Assistant's long-term statistics understand these resets, so graphs stay accurate.
+- If you rotate the API token, Home Assistant will prompt you to re-enter it.
 
 ## Security notes
 
-- Use a dedicated REST API administrator with the minimum profile described above, not a full admin.
-- Restrict trusted hosts to the Home Assistant IP.
-- The token is stored in Home Assistant's config entry storage.
+- Use a dedicated REST API administrator with the minimal profile described above, never a full administrator account.
+- Restrict the administrator's trusted hosts to your Home Assistant IP address.
 - Prefer a proper certificate on the FortiGate; only disable SSL verification for self-signed certificates on a trusted network.
+- The token is stored in Home Assistant's config entry storage.
 
 ## Out of scope
 
 - Presence detection (the core `fortios` integration covers this)
-- Creating, deleting or editing policies beyond their enable/disable status
+- Creating, deleting or editing policies beyond the two toggles above
 - FortiManager or FortiCloud managed devices
-
-## Roadmap
-
-- Options flow to select which policies get switches
-- Diagnostics, tests and CI, then publication through HACS
-- WAN interface sensors, VPN tunnel binary sensors and session count sensors

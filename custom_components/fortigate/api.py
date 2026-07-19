@@ -32,6 +32,14 @@ class FortiGateDevice:
 
 
 @dataclass(slots=True)
+class PolicyStats:
+    """Traffic statistics for a firewall policy."""
+
+    hit_count: int | None
+    bytes: int | None
+
+
+@dataclass(slots=True)
 class Policy:
     """A firewall policy as returned by the policy list call."""
 
@@ -41,6 +49,8 @@ class Policy:
     srcintf: list[str]
     dstintf: list[str]
     action: str
+    hit_count: int | None = None
+    bytes: int | None = None
 
 
 class FortiGateApi:
@@ -126,10 +136,32 @@ class FortiGateApi:
             )
         return policies
 
+    async def get_policy_stats(self) -> dict[int, PolicyStats]:
+        """Return per-policy traffic statistics keyed by policy id."""
+        data = await self._request("GET", "/monitor/firewall/policy")
+        stats: dict[int, PolicyStats] = {}
+        for raw in data.get("results") or []:
+            policy_id = raw.get("policyid")
+            if policy_id is None:
+                continue
+            stats[int(policy_id)] = PolicyStats(
+                hit_count=raw.get("hit_count"),
+                bytes=raw.get("bytes"),
+            )
+        return stats
+
     async def set_policy_status(self, policy_id: int, enabled: bool) -> None:
         """Enable or disable a single firewall policy."""
         await self._request(
             "PUT",
             f"/cmdb/firewall/policy/{policy_id}",
             json={"status": "enable" if enabled else "disable"},
+        )
+
+    async def set_policy_action(self, policy_id: int, allow: bool) -> None:
+        """Set a single firewall policy's action to accept or deny."""
+        await self._request(
+            "PUT",
+            f"/cmdb/firewall/policy/{policy_id}",
+            json={"action": "accept" if allow else "deny"},
         )

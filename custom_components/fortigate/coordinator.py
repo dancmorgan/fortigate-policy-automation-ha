@@ -55,8 +55,22 @@ class FortiGateCoordinator(DataUpdateCoordinator[dict[int, Policy]]):
 
     async def _async_update_data(self) -> dict[int, Policy]:
         try:
-            return await self.api.get_policies()
+            policies = await self.api.get_policies()
         except FortiGateAuthError as err:
             raise ConfigEntryAuthFailed(str(err)) from err
         except FortiGateApiError as err:
             raise UpdateFailed(str(err)) from err
+
+        try:
+            stats = await self.api.get_policy_stats()
+        except FortiGateAuthError as err:
+            raise ConfigEntryAuthFailed(str(err)) from err
+        except FortiGateApiError as err:
+            # Statistics are nice to have; keep the switches alive without them.
+            _LOGGER.warning("Policy statistics unavailable: %s", err)
+        else:
+            for policy_id, policy_stats in stats.items():
+                if (policy := policies.get(policy_id)) is not None:
+                    policy.hit_count = policy_stats.hit_count
+                    policy.bytes = policy_stats.bytes
+        return policies

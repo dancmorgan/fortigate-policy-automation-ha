@@ -34,5 +34,23 @@
       "already_configured": "This FortiGate is already configured.",
       "reauth_successful": "Reauthentication was successful."
     }
+  },
+  "entity": {
+    "switch": {
+      "policy_status": {
+        "name": "Enabled"
+      },
+      "policy_action": {
+        "name": "Allow traffic"
+      }
+    },
+    "sensor": {
+      "policy_hit_count": {
+        "name": "Hits"
+      },
+      "policy_bytes": {
+        "name": "Bytes"
+      }
+    }
   }
 }

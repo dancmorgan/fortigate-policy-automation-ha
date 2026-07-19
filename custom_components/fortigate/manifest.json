@@ -1,6 +1,6 @@
 {
   "domain": "fortigate",
-  "name": "FortiGate",
+  "name": "FortiGate Policy Automation",
   "codeowners": ["@dancmorgan"],
   "config_flow": true,
   "documentation": "https://github.com/dancmorgan/fortigate-policy-switch-ha",

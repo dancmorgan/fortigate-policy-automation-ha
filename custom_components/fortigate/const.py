@@ -12,4 +12,3 @@ DEFAULT_SCAN_INTERVAL = 30
 ATTR_POLICY_ID = "policy_id"
 ATTR_SRCINTF = "srcintf"
 ATTR_DSTINTF = "dstintf"
-ATTR_ACTION = "action"
