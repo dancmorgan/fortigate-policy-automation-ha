@@ -13,7 +13,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import UnitOfInformation
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import Policy
 from .coordinator import FortiGateConfigEntry, FortiGateCoordinator
@@ -49,7 +49,7 @@ SENSOR_DESCRIPTIONS: tuple[FortiGatePolicySensorDescription, ...] = (
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: FortiGateConfigEntry,
-    async_add_entities: AddConfigEntryEntitiesCallback,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up statistic sensors for every firewall policy."""
     coordinator = entry.runtime_data

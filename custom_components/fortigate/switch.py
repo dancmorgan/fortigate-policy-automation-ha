@@ -9,7 +9,7 @@ from typing import Any
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import FortiGateApi, FortiGateApiError, Policy
 from .const import ATTR_DSTINTF, ATTR_POLICY_ID, ATTR_SRCINTF
@@ -47,7 +47,7 @@ SWITCH_DESCRIPTIONS: tuple[FortiGatePolicySwitchDescription, ...] = (
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: FortiGateConfigEntry,
-    async_add_entities: AddConfigEntryEntitiesCallback,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up switches for every firewall policy."""
     coordinator = entry.runtime_data

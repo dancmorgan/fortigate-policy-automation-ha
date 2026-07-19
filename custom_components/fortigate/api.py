@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from dataclasses import dataclass
 from typing import Any
 
 import aiohttp
+
+_LOGGER = logging.getLogger(__name__)
 
 REQUEST_TIMEOUT = 15
 
@@ -80,6 +83,7 @@ class FortiGateApi:
         if params:
             query.update(params)
         headers = {"Authorization": f"Bearer {self._token}"}
+        _LOGGER.debug("%s %s (vdom=%s)", method, url, self._vdom)
         try:
             async with asyncio.timeout(REQUEST_TIMEOUT):
                 response = await self._session.request(

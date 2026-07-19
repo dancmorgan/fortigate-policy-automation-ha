@@ -55,9 +55,11 @@ class FortiGateConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             try:
                 device = await _validate(self.hass, user_input)
-            except FortiGateAuthError:
+            except FortiGateAuthError as err:
+                _LOGGER.warning("FortiGate rejected the API token: %s", err)
                 errors["base"] = "invalid_auth"
-            except FortiGateApiError:
+            except FortiGateApiError as err:
+                _LOGGER.warning("Could not connect to the FortiGate: %s", err)
                 errors["base"] = "cannot_connect"
             except Exception:
                 _LOGGER.exception("Unexpected error validating FortiGate connection")
@@ -90,9 +92,11 @@ class FortiGateConfigFlow(ConfigFlow, domain=DOMAIN):
             data = {**reauth_entry.data, CONF_API_TOKEN: user_input[CONF_API_TOKEN]}
             try:
                 await _validate(self.hass, data)
-            except FortiGateAuthError:
+            except FortiGateAuthError as err:
+                _LOGGER.warning("FortiGate rejected the API token: %s", err)
                 errors["base"] = "invalid_auth"
-            except FortiGateApiError:
+            except FortiGateApiError as err:
+                _LOGGER.warning("Could not connect to the FortiGate: %s", err)
                 errors["base"] = "cannot_connect"
             except Exception:
                 _LOGGER.exception("Unexpected error validating FortiGate connection")
