@@ -1,5 +1,5 @@
 {
-  "domain": "fortigate-policy-automation-ha",
+  "domain": "fortigate_policy_automation",
   "name": "FortiGate Policy Automation",
   "codeowners": ["@dancmorgan"],
   "config_flow": true,
@@ -8,5 +8,5 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/dancmorgan/fortigate-policy-switch-ha/issues",
   "requirements": [],
-  "version": "0.1.2"
+  "version": "0.1.3"
 }

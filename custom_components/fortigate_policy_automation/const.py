@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-DOMAIN = "fortigate"
+DOMAIN = "fortigate_policy_automation"
 
 CONF_VDOM = "vdom"
 
