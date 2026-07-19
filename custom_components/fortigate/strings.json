@@ -1,0 +1,38 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to your FortiGate",
+        "description": "Enter the details of your FortiGate and a REST API administrator token.",
+        "data": {
+          "host": "Host",
+          "api_token": "API token",
+          "vdom": "VDOM",
+          "verify_ssl": "Verify SSL certificate"
+        },
+        "data_description": {
+          "host": "Hostname or IP address of the FortiGate, with an optional port (for example fw.example.com or 192.168.1.99:8443).",
+          "api_token": "Token for a REST API administrator on the FortiGate.",
+          "vdom": "Virtual domain to manage. Leave as root unless you use multiple VDOMs.",
+          "verify_ssl": "Disable only if the FortiGate uses a self-signed certificate."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reauthenticate FortiGate",
+        "description": "The API token for {host} was rejected. Enter a new REST API administrator token.",
+        "data": {
+          "api_token": "API token"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the FortiGate. Check the host, port and SSL settings.",
+      "invalid_auth": "The FortiGate rejected the API token. Check the token and the administrator's trusted hosts.",
+      "unknown": "Unexpected error. Check the logs for details."
+    },
+    "abort": {
+      "already_configured": "This FortiGate is already configured.",
+      "reauth_successful": "Reauthentication was successful."
+    }
+  }
+}
