@@ -1,5 +1,5 @@
 {
-  "domain": "fortigate",
+  "domain": "fortigate-policy-automation-ha",
   "name": "FortiGate Policy Automation",
   "codeowners": ["@dancmorgan"],
   "config_flow": true,
