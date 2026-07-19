@@ -1,5 +1,7 @@
 # FortiGate Policy Automation for Home Assistant
 
+I built this to turn off home cameras / microphones / other remote monitoring devices when I am home to prevent surveillance or monitoring.
+
 Control your FortiGate firewall policies straight from Home Assistant. Every firewall policy appears as its own device with two simple toggles:
 
 - **Policy Enabled** turns the policy on or off, exactly like the enable/disable toggle in the FortiGate interface.
@@ -48,6 +50,7 @@ That's it. Your firewall policies will appear under **Settings > Devices & servi
 ## Good to know
 
 - Toggling **Policy Action Allow** off changes the policy's action to deny; the policy stays enabled, it just blocks instead of allows. IPsec policies do not get this toggle because their action must not change.
+- FortiOS normally resets accept-only settings such as NAT, security profiles and traffic shapers when a policy's action changes to deny. The integration saves those settings just before switching to deny and restores them when re-allowing, so they survive the round trip. This only works when the switch to deny was made through Home Assistant; if the action was changed directly on the firewall, there is nothing saved to restore.
 - If a policy is deleted on the FortiGate, its toggles become unavailable in Home Assistant.
 - The hit and byte counters reset when the FortiGate reboots or when you clear them on the firewall. Home Assistant's long-term statistics understand these resets, so graphs stay accurate.
 - If you rotate the API token, Home Assistant will prompt you to re-enter it.

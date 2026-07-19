@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .api import FortiGateApi, FortiGateApiError, Policy
+from .api import FortiGateApiError, Policy
 from .const import ATTR_DSTINTF, ATTR_POLICY_ID, ATTR_SRCINTF
 from .coordinator import FortiGateConfigEntry, FortiGateCoordinator
 from .entity import FortiGatePolicyEntity
@@ -22,7 +22,7 @@ class FortiGatePolicySwitchDescription(SwitchEntityDescription):
     """Describes one toggle available on a firewall policy."""
 
     is_on_fn: Callable[[Policy], bool]
-    set_fn: Callable[[FortiGateApi, int, bool], Coroutine[Any, Any, None]]
+    set_fn: Callable[[FortiGateCoordinator, int, bool], Coroutine[Any, Any, None]]
     suitable_fn: Callable[[Policy], bool] = lambda policy: True
 
 
@@ -32,14 +32,18 @@ SWITCH_DESCRIPTIONS: tuple[FortiGatePolicySwitchDescription, ...] = (
         translation_key="policy_status",
         icon="mdi:toggle-switch",
         is_on_fn=lambda policy: policy.enabled,
-        set_fn=lambda api, policy_id, on: api.set_policy_status(policy_id, on),
+        set_fn=lambda coord, policy_id, on: coord.api.set_policy_status(
+            policy_id, on
+        ),
     ),
     FortiGatePolicySwitchDescription(
         key="action",
         translation_key="policy_action",
         icon="mdi:toggle-switch",
         is_on_fn=lambda policy: policy.action == "accept",
-        set_fn=lambda api, policy_id, on: api.set_policy_action(policy_id, on),
+        set_fn=lambda coord, policy_id, on: coord.async_set_policy_action(
+            policy_id, on
+        ),
         # IPsec (and other non accept/deny) policies must keep their action.
         suitable_fn=lambda policy: policy.action in ("accept", "deny"),
     ),
@@ -119,7 +123,7 @@ class FortiGatePolicySwitch(FortiGatePolicyEntity, SwitchEntity):
     async def _async_set(self, on: bool) -> None:
         try:
             await self.entity_description.set_fn(
-                self.coordinator.api, self._policy_id, on
+                self.coordinator, self._policy_id, on
             )
         except FortiGateApiError as err:
             raise HomeAssistantError(

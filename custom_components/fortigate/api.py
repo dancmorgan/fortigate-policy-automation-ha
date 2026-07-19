@@ -164,10 +164,31 @@ class FortiGateApi:
             json={"status": "enable" if enabled else "disable"},
         )
 
-    async def set_policy_action(self, policy_id: int, allow: bool) -> None:
-        """Set a single firewall policy's action to accept or deny."""
+    async def get_policy(self, policy_id: int) -> dict[str, Any]:
+        """Return the full configuration of a single firewall policy."""
+        data = await self._request("GET", f"/cmdb/firewall/policy/{policy_id}")
+        results = data.get("results")
+        if isinstance(results, list) and results:
+            return results[0]
+        if isinstance(results, dict):
+            return results
+        raise FortiGateApiError(f"Policy {policy_id} not found")
+
+    async def set_policy_action(
+        self,
+        policy_id: int,
+        allow: bool,
+        restore: dict[str, Any] | None = None,
+    ) -> None:
+        """Set a policy's action to accept or deny.
+
+        When re-allowing, `restore` carries the accept-only settings (NAT,
+        security profiles, shapers) saved before the switch to deny, so they
+        are reinstated in the same request.
+        """
+        body: dict[str, Any] = {"action": "accept" if allow else "deny"}
+        if allow and restore:
+            body.update(restore)
         await self._request(
-            "PUT",
-            f"/cmdb/firewall/policy/{policy_id}",
-            json={"action": "accept" if allow else "deny"},
+            "PUT", f"/cmdb/firewall/policy/{policy_id}", json=body
         )
