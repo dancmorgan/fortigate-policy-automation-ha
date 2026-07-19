@@ -14,6 +14,10 @@ Each policy also gets two counters, ready for dashboards and graphs:
 
 Policy devices are named by their policy ID, which never changes on the FortiGate. The current policy name and its comment are exposed as **Policy Name** and **Policy Comment** sensors, so renames on the firewall show up in Home Assistant within one polling cycle.
 
+<img src="docs/policy-sensors-and-switches.png" alt="A firewall policy device page in Home Assistant, with Policy Enabled and Policy Action Allow toggles, Bytes and Hits counters, and Policy Name and Policy Comment sensors" width="900">
+
+Above: a real policy device. This one blocks traffic to blacklisted IPs, with 29,303 hits counted, and both toggles ready for dashboards and automations.
+
 Use them on dashboards or in automations, for example to cut off internet access to the kids' devices at bedtime, or to open a rule only while you are home.
 
 Everything runs locally over the FortiGate's REST API. There is no cloud dependency, and Home Assistant checks the firewall every 30 seconds so the toggles always reflect what the firewall is really doing.
@@ -46,6 +50,8 @@ This integration is installed through [HACS](https://hacs.xyz), the community st
 7. Enter your FortiGate's hostname or IP address, paste the API token, and leave the VDOM as `root` unless you use multiple VDOMs. If your FortiGate uses a self-signed certificate, untick **Verify SSL certificate**.
 
 That's it. Your firewall policies will appear under **Settings > Devices & services > FortiGate Policy Automation**, one device per policy, all linked to the FortiGate itself.
+
+<img src="docs/integration-frontpage.png" alt="The FortiGate Policy Automation integration page in Home Assistant, showing the FortiGate hub with one device per firewall policy, each carrying six entities" width="900">
 
 ## Good to know
 
