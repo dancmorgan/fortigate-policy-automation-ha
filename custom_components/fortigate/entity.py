@@ -19,10 +19,9 @@ class FortiGatePolicyEntity(CoordinatorEntity[FortiGateCoordinator]):
         super().__init__(coordinator)
         self._policy_id = policy_id
         serial = coordinator.device.serial
-        policy = coordinator.data[policy_id]
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, f"{serial}_policy_{policy_id}")},
-            name=policy.name,
+            name=f"Policy {policy_id}",
             manufacturer="Fortinet",
             model="Firewall policy",
             via_device=(DOMAIN, serial),

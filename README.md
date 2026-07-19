@@ -2,13 +2,15 @@
 
 Control your FortiGate firewall policies straight from Home Assistant. Every firewall policy appears as its own device with two simple toggles:
 
-- **Enabled** turns the policy on or off, exactly like the enable/disable toggle in the FortiGate interface.
-- **Allow traffic** flips the policy between allow (accept) and deny.
+- **Policy Enabled** turns the policy on or off, exactly like the enable/disable toggle in the FortiGate interface.
+- **Policy Action Allow** flips the policy between allow (accept) and deny.
 
 Each policy also gets two counters, ready for dashboards and graphs:
 
 - **Hits** counts how many times the policy has matched traffic.
 - **Bytes** tracks how much data has passed through the policy.
+
+Policy devices are named by their policy ID, which never changes on the FortiGate. The current policy name and its comment are exposed as **Policy Name** and **Policy Comment** sensors, so renames on the firewall show up in Home Assistant within one polling cycle.
 
 Use them on dashboards or in automations, for example to cut off internet access to the kids' devices at bedtime, or to open a rule only while you are home.
 
@@ -45,7 +47,7 @@ That's it. Your firewall policies will appear under **Settings > Devices & servi
 
 ## Good to know
 
-- Toggling **Allow traffic** off changes the policy's action to deny; the policy stays enabled, it just blocks instead of allows. IPsec policies do not get this toggle because their action must not change.
+- Toggling **Policy Action Allow** off changes the policy's action to deny; the policy stays enabled, it just blocks instead of allows. IPsec policies do not get this toggle because their action must not change.
 - If a policy is deleted on the FortiGate, its toggles become unavailable in Home Assistant.
 - The hit and byte counters reset when the FortiGate reboots or when you clear them on the firewall. Home Assistant's long-term statistics understand these resets, so graphs stay accurate.
 - If you rotate the API token, Home Assistant will prompt you to re-enter it.

@@ -22,25 +22,41 @@ from .entity import FortiGatePolicyEntity
 
 @dataclass(frozen=True, kw_only=True)
 class FortiGatePolicySensorDescription(SensorEntityDescription):
-    """Describes one statistic available on a firewall policy."""
+    """Describes one value available on a firewall policy."""
 
-    value_fn: Callable[[Policy], int | None]
+    value_fn: Callable[[Policy], int | str | None]
 
 
 SENSOR_DESCRIPTIONS: tuple[FortiGatePolicySensorDescription, ...] = (
     FortiGatePolicySensorDescription(
+        key="name",
+        translation_key="policy_name",
+        icon="mdi:rename-box",
+        value_fn=lambda policy: policy.name,
+    ),
+    FortiGatePolicySensorDescription(
+        key="comment",
+        translation_key="policy_comment",
+        icon="mdi:comment-text-outline",
+        # None when empty so the sensor reads unknown rather than blank.
+        value_fn=lambda policy: policy.comments or None,
+    ),
+    FortiGatePolicySensorDescription(
         key="hit_count",
         translation_key="policy_hit_count",
+        icon="mdi:counter",
         state_class=SensorStateClass.TOTAL_INCREASING,
         value_fn=lambda policy: policy.hit_count,
     ),
     FortiGatePolicySensorDescription(
         key="bytes",
         translation_key="policy_bytes",
+        icon="mdi:sort-numeric-descending",
         device_class=SensorDeviceClass.DATA_SIZE,
         native_unit_of_measurement=UnitOfInformation.BYTES,
+        suggested_unit_of_measurement=UnitOfInformation.MEBIBYTES,
         state_class=SensorStateClass.TOTAL_INCREASING,
-        suggested_display_precision=0,
+        suggested_display_precision=2,
         value_fn=lambda policy: policy.bytes,
     ),
 )
@@ -89,7 +105,11 @@ class FortiGatePolicySensor(FortiGatePolicyEntity, SensorEntity):
         self.entity_id = f"sensor.fortigate_policy_{policy_id}_{description.key}"
 
     @property
-    def native_value(self) -> int | None:
+    def native_value(self) -> int | str | None:
         if (policy := self._policy) is None:
             return None
-        return self.entity_description.value_fn(policy)
+        value = self.entity_description.value_fn(policy)
+        if isinstance(value, str):
+            # Entity states are capped at 255 characters.
+            return value[:255]
+        return value

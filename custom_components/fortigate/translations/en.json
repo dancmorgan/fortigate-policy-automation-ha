@@ -26,9 +26,9 @@
       }
     },
     "error": {
-      "cannot_connect": "Failed to connect to the FortiGate. Check the host, port and SSL settings.",
-      "invalid_auth": "The FortiGate rejected the API token. Check the token and the administrator's trusted hosts.",
-      "unknown": "Unexpected error. Check the logs for details."
+      "cannot_connect": "Failed to connect to the FortiGate. Check the host, port and SSL settings. Details: {error_detail}",
+      "invalid_auth": "The FortiGate rejected the API token. Check the token and the administrator's trusted hosts. Details: {error_detail}",
+      "unknown": "Unexpected error: {error_detail}"
     },
     "abort": {
       "already_configured": "This FortiGate is already configured.",
@@ -38,13 +38,19 @@
   "entity": {
     "switch": {
       "policy_status": {
-        "name": "Enabled"
+        "name": "Policy Enabled"
       },
       "policy_action": {
-        "name": "Allow traffic"
+        "name": "Policy Action Allow"
       }
     },
     "sensor": {
+      "policy_name": {
+        "name": "Policy Name"
+      },
+      "policy_comment": {
+        "name": "Policy Comment"
+      },
       "policy_hit_count": {
         "name": "Hits"
       },

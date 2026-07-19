@@ -30,12 +30,14 @@ SWITCH_DESCRIPTIONS: tuple[FortiGatePolicySwitchDescription, ...] = (
     FortiGatePolicySwitchDescription(
         key="status",
         translation_key="policy_status",
+        icon="mdi:toggle-switch",
         is_on_fn=lambda policy: policy.enabled,
         set_fn=lambda api, policy_id, on: api.set_policy_status(policy_id, on),
     ),
     FortiGatePolicySwitchDescription(
         key="action",
         translation_key="policy_action",
+        icon="mdi:toggle-switch",
         is_on_fn=lambda policy: policy.action == "accept",
         set_fn=lambda api, policy_id, on: api.set_policy_action(policy_id, on),
         # IPsec (and other non accept/deny) policies must keep their action.

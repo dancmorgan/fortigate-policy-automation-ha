@@ -13,7 +13,7 @@ _LOGGER = logging.getLogger(__name__)
 
 REQUEST_TIMEOUT = 15
 
-POLICY_FORMAT = "policyid|name|status|srcintf|dstintf|action"
+POLICY_FORMAT = "policyid|name|status|srcintf|dstintf|action|comments"
 
 
 class FortiGateApiError(Exception):
@@ -52,6 +52,7 @@ class Policy:
     srcintf: list[str]
     dstintf: list[str]
     action: str
+    comments: str = ""
     hit_count: int | None = None
     bytes: int | None = None
 
@@ -137,6 +138,7 @@ class FortiGateApi:
                 srcintf=[i["name"] for i in raw.get("srcintf") or [] if "name" in i],
                 dstintf=[i["name"] for i in raw.get("dstintf") or [] if "name" in i],
                 action=raw.get("action") or "",
+                comments=raw.get("comments") or "",
             )
         return policies
 

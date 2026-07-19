@@ -52,18 +52,22 @@ class FortiGateConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         """Handle the initial step."""
         errors: dict[str, str] = {}
+        error_detail = ""
         if user_input is not None:
             try:
                 device = await _validate(self.hass, user_input)
             except FortiGateAuthError as err:
                 _LOGGER.warning("FortiGate rejected the API token: %s", err)
                 errors["base"] = "invalid_auth"
+                error_detail = str(err)
             except FortiGateApiError as err:
                 _LOGGER.warning("Could not connect to the FortiGate: %s", err)
                 errors["base"] = "cannot_connect"
-            except Exception:
+                error_detail = str(err)
+            except Exception as err:
                 _LOGGER.exception("Unexpected error validating FortiGate connection")
                 errors["base"] = "unknown"
+                error_detail = str(err)
             else:
                 await self.async_set_unique_id(device.serial)
                 self._abort_if_unique_id_configured()
@@ -73,6 +77,7 @@ class FortiGateConfigFlow(ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user",
             data_schema=self.add_suggested_values_to_schema(USER_SCHEMA, user_input),
+            description_placeholders={"error_detail": error_detail},
             errors=errors,
         )
 
@@ -87,6 +92,7 @@ class FortiGateConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         """Ask for a replacement API token and validate it."""
         errors: dict[str, str] = {}
+        error_detail = ""
         reauth_entry = self._get_reauth_entry()
         if user_input is not None:
             data = {**reauth_entry.data, CONF_API_TOKEN: user_input[CONF_API_TOKEN]}
@@ -95,17 +101,23 @@ class FortiGateConfigFlow(ConfigFlow, domain=DOMAIN):
             except FortiGateAuthError as err:
                 _LOGGER.warning("FortiGate rejected the API token: %s", err)
                 errors["base"] = "invalid_auth"
+                error_detail = str(err)
             except FortiGateApiError as err:
                 _LOGGER.warning("Could not connect to the FortiGate: %s", err)
                 errors["base"] = "cannot_connect"
-            except Exception:
+                error_detail = str(err)
+            except Exception as err:
                 _LOGGER.exception("Unexpected error validating FortiGate connection")
                 errors["base"] = "unknown"
+                error_detail = str(err)
             else:
                 return self.async_update_reload_and_abort(reauth_entry, data=data)
         return self.async_show_form(
             step_id="reauth_confirm",
             data_schema=REAUTH_SCHEMA,
-            description_placeholders={CONF_HOST: reauth_entry.data[CONF_HOST]},
+            description_placeholders={
+                CONF_HOST: reauth_entry.data[CONF_HOST],
+                "error_detail": error_detail,
+            },
             errors=errors,
         )
