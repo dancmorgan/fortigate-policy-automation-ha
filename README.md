@@ -22,7 +22,7 @@ Everything runs locally over the FortiGate's REST API. There is no cloud depende
 
 You will need three things:
 
-1. **FortiOS 7.x** on your FortiGate (6.4 or newer may work but is not tested).
+1. **FortiOS 6.2 or newer** on your FortiGate (developed and tested against 6.2 and 7.x).
 2. **HTTPS enabled on the interface Home Assistant connects through.** The REST API is only reachable over HTTPS, so make sure it is switched on for the right interface: in the FortiGate interface go to **Network > Interfaces**, edit the interface that faces Home Assistant (usually your LAN interface), and tick **HTTPS** under **Administrative Access**. Save the change.
 3. **A REST API administrator token.** See the next section.
 
