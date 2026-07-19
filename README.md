@@ -67,3 +67,7 @@ That's it. Your firewall policies will appear under **Settings > Devices & servi
 - Presence detection (the core `fortios` integration covers this)
 - Creating, deleting or editing policies beyond the two toggles above
 - FortiManager or FortiCloud managed devices
+
+## Licence
+
+This project is licensed under the [MIT License](LICENSE).
